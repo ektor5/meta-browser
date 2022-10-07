@@ -1,0 +1,1 @@
+S = "${RUSTSRC}/src/libtest"

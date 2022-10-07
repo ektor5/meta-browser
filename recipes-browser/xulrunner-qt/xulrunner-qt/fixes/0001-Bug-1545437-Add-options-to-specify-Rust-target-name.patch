@@ -1,0 +1,76 @@
+From 16091c9c9a066c08cc045e476ae395b2671e0f9e Mon Sep 17 00:00:00 2001
+From: Ettore Chimenti <ettore.chimenti@seco.com>
+Date: Thu, 6 Oct 2022 13:14:55 +0000
+Subject: [PATCH] Bug 1545437 - Add options to specify Rust target name
+
+Certain build systems such as Yocto know more suitable Rust target name, so it
+would be better that there is a way to pass it to Mozilla's build system.
+
+Differential Revision: https://phabricator.services.mozilla.com/D28069
+---
+ build/moz.configure/rust.configure | 35 +++++++++++++++++++++++++++---
+ 1 file changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/build/moz.configure/rust.configure b/build/moz.configure/rust.configure
+index e5122d6b86e9..259e96e9385b 100644
+--- a/build/moz.configure/rust.configure
++++ b/build/moz.configure/rust.configure
+@@ -217,6 +217,26 @@ def rust_supported_targets(rustc):
+         data.setdefault(key, []).append(namespace(rust_target=t, target=info))
+     return data
+ 
++option(env='RUST_HOST',
++       nargs=1,
++       help='Define the system type for Rust performing the build')
++
++@depends('RUST_HOST')
++@checking('rust host', lambda host: host)
++def rust_host_env(value):
++    if value:
++        return value[0]
++
++
++option(env='RUST_TARGET',
++       nargs=1,
++       help='Define the system type for Rust where the resulting executables will be used')
++
++@depends('RUST_TARGET')
++@checking('rust target', lambda target: target)
++def rust_target_env(value):
++    if value:
++        return value[0]
+ 
+ @template
+ def rust_triple_alias(host_or_target, host_or_target_c_compiler):
+@@ -229,7 +249,9 @@ def rust_triple_alias(host_or_target, host_or_target_c_compiler):
+     host_or_target_str = {host: 'host', target: 'target'}[host_or_target]
+ 
+     @depends(rustc, host_or_target, host_or_target_c_compiler,
+-             rust_supported_targets, arm_target, when=rust_compiler)
++	      rust_host_env, rust_target_env,
++              c_compiler, rust_supported_targets, arm_target,
++              when=rust_compiler)
+     @checking('for rust %s triplet' % host_or_target_str)
+     @imports('os')
+     @imports(_from='mozbuild.configure.util', _import='LineIO')
+@@ -237,8 +259,15 @@ def rust_triple_alias(host_or_target, host_or_target_c_compiler):
+     @imports(_from='six', _import='ensure_binary')
+     @imports(_from='tempfile', _import='mkstemp')
+     @imports(_from='textwrap', _import='dedent')
+-    def rust_target(rustc, host_or_target, compiler_info,
+-                    rust_supported_targets, arm_target):
++    def rust_target(rustc, host_or_target, host_or_target_c_compiler,
++		    rust_host_env, rust_target_env, compiler_info,
++		    rust_supported_targets, arm_target):
++
++        specified_targets = {"host": rust_host_env, "target": rust_target_env}
++        specified_target = specified_targets[host_or_target_str]
++        if (specified_target):
++            return specified_target
++
+         # Rust's --target options are similar to, but not exactly the same
+         # as, the autoconf-derived targets we use.  An example would be that
+         # Rust uses distinct target triples for targetting the GNU C++ ABI
+-- 
+2.17.1
+
