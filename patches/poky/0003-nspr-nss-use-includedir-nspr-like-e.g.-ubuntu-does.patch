@@ -1,0 +1,86 @@
+From 7a1a061ef5ca29c89a11c2a75936c6213b76bb45 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Mon, 27 Jan 2020 16:43:30 +0100
+Subject: [PATCH 3/4] nspr, nss: use ${includedir}/nspr like e.g. ubuntu does
+
+* instead of installing all 51 nspr header files directly in ${includedir}
+
+* ubuntu uses /usr/include/nspr as well as shown in:
+  https://packages.ubuntu.com/xenial/amd64/libnspr4-dev/filelist
+  and some components assume the same path
+
+* update nss configure to find them, similar change might be needed in
+  mozjs and ecryptfs-utils
+
+(From OE-Core rev: 274128830a9d52bdd2827cc0a323d575025ce62f)
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ meta/recipes-support/nspr/nspr/nspr.pc.in | 2 +-
+ meta/recipes-support/nspr/nspr_4.24.bb    | 4 ++++
+ meta/recipes-support/nss/nss/nss.pc.in    | 2 +-
+ meta/recipes-support/nss/nss_3.45.bb      | 4 +++-
+ 4 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/meta/recipes-support/nspr/nspr/nspr.pc.in b/meta/recipes-support/nspr/nspr/nspr.pc.in
+index d74caabe4cc5..1f15d19cfad5 100644
+--- a/meta/recipes-support/nspr/nspr/nspr.pc.in
++++ b/meta/recipes-support/nspr/nspr/nspr.pc.in
+@@ -8,4 +8,4 @@ Name: NSPR
+ Description: The Netscape Portable Runtime
+ Version: NSPRVERSION
+ Libs: -L${libdir} -lplds4 -lplc4 -lnspr4 -lpthread -ldl
+-Cflags:
++Cflags: -I${includedir}/nspr
+diff --git a/meta/recipes-support/nspr/nspr_4.24.bb b/meta/recipes-support/nspr/nspr_4.24.bb
+index 5f823f894149..e98fe83ed318 100644
+--- a/meta/recipes-support/nspr/nspr_4.24.bb
++++ b/meta/recipes-support/nspr/nspr_4.24.bb
+@@ -156,6 +156,10 @@ MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/nspr-config"
+ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
+ PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
+ 
++# Do not install nspr in usr/include, but in usr/include/nspr, the
++# preferred path upstream.
++EXTRA_OECONF += "--includedir=${includedir}/nspr"
++
+ do_compile_prepend() {
+ 	oe_runmake CROSS_COMPILE=1 CFLAGS="-DXP_UNIX ${BUILD_CFLAGS}" LDFLAGS="" CC="${BUILD_CC}" -C config export
+ }
+diff --git a/meta/recipes-support/nss/nss/nss.pc.in b/meta/recipes-support/nss/nss/nss.pc.in
+index 200f635c65c7..402b4ecb339a 100644
+--- a/meta/recipes-support/nss/nss/nss.pc.in
++++ b/meta/recipes-support/nss/nss/nss.pc.in
+@@ -7,5 +7,5 @@ Name: NSS
+ Description: Network Security Services
+ Version: %NSS_VERSION%
+ Requires: nspr >= %NSPR_VERSION%
+-Libs: -lssl3 -lsmime3 -lnss3 -lsoftokn3 -lnssutil3
++Libs: -L${libdir} -lssl3 -lsmime3 -lnss3 -lsoftokn3 -lnssutil3
+ Cflags: -IOEINCDIR
+diff --git a/meta/recipes-support/nss/nss_3.45.bb b/meta/recipes-support/nss/nss_3.45.bb
+index 9fe27af5dbc5..bb9fad181149 100644
+--- a/meta/recipes-support/nss/nss_3.45.bb
++++ b/meta/recipes-support/nss/nss_3.45.bb
+@@ -53,7 +53,7 @@ do_configure_prepend_libc-musl () {
+ }
+ 
+ do_compile_prepend_class-native() {
+-    export NSPR_INCLUDE_DIR=${STAGING_INCDIR_NATIVE}
++    export NSPR_INCLUDE_DIR=${STAGING_INCDIR_NATIVE}/nspr
+     export NSPR_LIB_DIR=${STAGING_LIBDIR_NATIVE}
+     export NSS_ENABLE_WERROR=0
+ }
+@@ -68,6 +68,8 @@ do_compile_prepend_class-native() {
+ }
+ 
+ do_compile() {
++    export NSPR_INCLUDE_DIR=${STAGING_INCDIR}/nspr
++
+     export CROSS_COMPILE=1
+     export NATIVE_CC="${BUILD_CC}"
+     export NATIVE_FLAGS="${BUILD_CFLAGS}"
+-- 
+2.17.1
+

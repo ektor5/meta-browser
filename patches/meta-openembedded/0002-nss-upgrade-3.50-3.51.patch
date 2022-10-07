@@ -1,0 +1,33 @@
+From d79aa97519b2b6d35a32ba3162debea27e0bf6c9 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@cn.fujitsu.com>
+Date: Thu, 19 Mar 2020 00:39:17 -0700
+Subject: [PATCH 2/7] nss: upgrade 3.50 -> 3.51
+
+Signed-off-by: Wang Mingyu <wangmy@cn.fujitsu.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meta-oe/recipes-support/nss/{nss_3.50.bb => nss_3.51.bb} | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+ rename meta-oe/recipes-support/nss/{nss_3.50.bb => nss_3.51.bb} (98%)
+
+diff --git a/meta-oe/recipes-support/nss/nss_3.50.bb b/meta-oe/recipes-support/nss/nss_3.51.bb
+similarity index 98%
+rename from meta-oe/recipes-support/nss/nss_3.50.bb
+rename to meta-oe/recipes-support/nss/nss_3.51.bb
+index e9855d7a7e1b..889967c03b4e 100644
+--- a/meta-oe/recipes-support/nss/nss_3.50.bb
++++ b/meta-oe/recipes-support/nss/nss_3.51.bb
+@@ -34,8 +34,8 @@ SRC_URI = "http://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/${VERSIO
+            file://0001-freebl-add-a-configure-option-to-disable-ARM-HW-cryp.patch \
+            "
+ 
+-SRC_URI[md5sum] = "e0366615e12b147cebc136c915baea37"
+-SRC_URI[sha256sum] = "185df319775243f5f5daa9d49b7f9cc5f2b389435be3247c3376579bee063ba7"
++SRC_URI[md5sum] = "e59dc16965ef7713669c628d2640ebd1"
++SRC_URI[sha256sum] = "75348b3b3229362486c57a880db917da1f96ef4eb639dc9cc2ff17d72268459c"
+ 
+ UPSTREAM_CHECK_URI = "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/NSS_Releases"
+ UPSTREAM_CHECK_REGEX = "NSS_(?P<pver>.+)_release_notes"
+-- 
+2.17.1
+

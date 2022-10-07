@@ -1,0 +1,31 @@
+From 048a0d09ddc1649bc70e781658667bb2309085b9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 May 2020 22:59:12 -0700
+Subject: [PATCH 6/7] nss: Remove mcpu to avoid march conflicts
+
+Some files are compiled with armv8-a+crypto and when using cortex-a55
+the deduced march is armv8.2-a which then conflicts
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meta-oe/recipes-support/nss/nss_3.51.1.bb | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/meta-oe/recipes-support/nss/nss_3.51.1.bb b/meta-oe/recipes-support/nss/nss_3.51.1.bb
+index fba80ce2abf5..36e6cd8fc51e 100644
+--- a/meta-oe/recipes-support/nss/nss_3.51.1.bb
++++ b/meta-oe/recipes-support/nss/nss_3.51.1.bb
+@@ -47,6 +47,10 @@ inherit siteinfo
+ TD = "${S}/tentative-dist"
+ TDS = "${S}/tentative-dist-staging"
+ 
++# cortex-a55 is ARMv8.2-a based but libatomic explicitly asks for -march=armv8.1-a
++# which caused -march conflicts in gcc
++TUNE_CCARGS_remove = "-mcpu=cortex-a55+crc -mcpu=cortex-a55 -mcpu=cortex-a55+crc+crypto"
++
+ TARGET_CC_ARCH += "${LDFLAGS}"
+ 
+ do_configure_prepend_libc-musl () {
+-- 
+2.17.1
+
