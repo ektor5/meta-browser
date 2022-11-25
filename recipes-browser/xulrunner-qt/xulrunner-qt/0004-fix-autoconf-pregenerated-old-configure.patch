@@ -1,0 +1,43 @@
+From 2a87ed164d505f5e94c0c50cbc1b810320568d4e Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Fri, 25 Nov 2022 08:57:19 +0000
+Subject: [PATCH] fix autoconf pregenerated old-configure
+
+---
+ build/moz.configure/old.configure | 2 ++
+ old-configure                     | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/build/moz.configure/old.configure b/build/moz.configure/old.configure
+index e24df1e70dfe..bd7ef5769866 100644
+--- a/build/moz.configure/old.configure
++++ b/build/moz.configure/old.configure
+@@ -20,6 +20,7 @@ option(env='AUTOCONF', nargs=1, help='Path to autoconf 2.13')
+ @imports(_from='os.path', _import='exists')
+ @imports('re')
+ def autoconf(mozconfig, autoconf):
++    return "autoconf2.13"
+     mozconfig_autoconf = None
+     if mozconfig['path']:
+         make_extra = mozconfig['make_extra']
+@@ -101,6 +102,7 @@ def prepare_configure(old_configure, mozconfig, autoconf, build_env, shell,
+                 break
+         else:
+             refresh = False
++    refresh = False
+ 
+     if refresh:
+         log.info('Refreshing %s with %s', old_configure, autoconf)
+diff --git a/old-configure b/old-configure
+index f2f40def1576..6ae984c4f713 100644
+--- a/old-configure
++++ b/old-configure
+@@ -10931,7 +10931,7 @@ test -n "$HOST_QMAKE" || HOST_QMAKE=""""
+     else
+         HOST_QMAKE="$QTDIR/bin/qmake"
+     fi
+-    QT_VERSION=`$HOST_QMAKE -v | grep 'Using Qt version' | egrep -o '[0-9]+\.[0-9]+\.[0-9]+'`
++    QT_VERSION=`$HOST_QMAKE -v | grep 'Using Qt version' | egrep -o '[0-9]+\.[0-9]+\.[0-9]+' | head -n1`
+ 
+     if test -z "$QTDIR"; then
+         case $QT_VERSION in

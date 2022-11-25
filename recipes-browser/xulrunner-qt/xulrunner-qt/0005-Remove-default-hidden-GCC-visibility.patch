@@ -1,0 +1,19 @@
+From 0c5cc1d2d8cd0f3d2241cd1999e212788fd8b055 Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Fri, 25 Nov 2022 08:58:11 +0000
+Subject: [PATCH] Remove default hidden GCC visibility
+
+---
+ config/gcc_hidden.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/gcc_hidden.h b/config/gcc_hidden.h
+index 075e68c88bf9..0e8451684d21 100644
+--- a/config/gcc_hidden.h
++++ b/config/gcc_hidden.h
+@@ -3,4 +3,4 @@
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ /* Begin all files as hidden visibility */
+-#pragma GCC visibility push(hidden)
++//#pragma GCC visibility push(hidden)

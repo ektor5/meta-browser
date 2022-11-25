@@ -1,0 +1,46 @@
+From c66917d135d8dab899b025de9033a6f6854aa77f Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Thu, 24 Nov 2022 00:25:12 +0000
+Subject: [PATCH] Add RUSTSTDLIB variable to configure
+
+---
+ build/moz.configure/rust.configure | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/build/moz.configure/rust.configure b/build/moz.configure/rust.configure
+index ed36bc37cd5d..c620c93a8622 100644
+--- a/build/moz.configure/rust.configure
++++ b/build/moz.configure/rust.configure
+@@ -208,14 +208,22 @@ option(env='RUST_TARGET',
+ def rust_target(value):
+     return value[0]
+ 
+-@depends(target, rustc, rust_target, when=rust_compiler)
++option(env='RUSTSTDLIB',
++       nargs=1,
++       help='Rust std lib')
++@depends('RUSTSTDLIB')
++@checking('rust std lib', lambda target: target)
++def ruststdlib(value):
++    return value[0]
++
++@depends(target, rustc, rust_target, ruststdlib, when=rust_compiler)
+ @imports('os')
+ @imports('subprocess')
+ @imports(_from='mozbuild.configure.util', _import='LineIO')
+ @imports(_from='mozbuild.shellutil', _import='quote')
+ @imports(_from='tempfile', _import='mkstemp')
+ @imports(_from='textwrap', _import='dedent')
+-def available_rust_target(target, rustc, rust_target):
++def available_rust_target(target, rustc, rust_target, ruststdlib):
+     # Check to see whether our rustc has a reasonably functional stdlib
+     # for our chosen target.
+     target_arg = '--target=' + rust_target
+@@ -234,6 +242,7 @@ def available_rust_target(target, rustc, rust_target):
+         cmd = [
+             rustc,
+             '--crate-type', 'staticlib',
++            '-L', ruststdlib,
+             target_arg,
+             '-o', out_path,
+             in_path,
