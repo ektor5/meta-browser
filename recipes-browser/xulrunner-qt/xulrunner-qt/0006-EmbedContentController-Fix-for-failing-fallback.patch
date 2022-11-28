@@ -1,0 +1,23 @@
+From 22b02ccaeb780eb264bf5ebca6e7454096751b24 Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Mon, 28 Nov 2022 19:20:54 +0000
+Subject: [PATCH] EmbedContentController: Fix for failing fallback
+
+---
+ embedding/embedlite/embedthread/EmbedContentController.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/embedding/embedlite/embedthread/EmbedContentController.cpp b/embedding/embedlite/embedthread/EmbedContentController.cpp
+index f94fb29b8ba4..5f9bc53aba47 100644
+--- a/embedding/embedlite/embedthread/EmbedContentController.cpp
++++ b/embedding/embedlite/embedthread/EmbedContentController.cpp
+@@ -54,8 +54,8 @@ void EmbedContentController::HandleTap(TapType aType, const LayoutDevicePoint &a
+       HandleLongTap(aPoint, aModifiers, aGuid, aInputBlockId);
+       break;
+     case GeckoContentController::TapType::eSecondTap:
+-    case GeckoContentController::TapType::eLongTapUp:
+       MOZ_FALLTHROUGH;
++    case GeckoContentController::TapType::eLongTapUp:
+       break;
+   }
+ }

@@ -1,0 +1,56 @@
+From bd1d2ad7d19cda3d02373ac86157e16153c4a47c Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Mon, 28 Nov 2022 19:21:33 +0000
+Subject: [PATCH] Various refactoring include paths
+
+Include hiherarcy makes QPainterPath not visible
+---
+ gfx/cairo/cairo/src/cairo-qt-surface.cpp  | 1 +
+ ipc/chromium/src/base/message_pump_qt.cpp | 4 ++--
+ toolkit/xre/nsQAppInstance.cpp            | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/gfx/cairo/cairo/src/cairo-qt-surface.cpp b/gfx/cairo/cairo/src/cairo-qt-surface.cpp
+index 6311c7100f0e..d2cc1636635d 100644
+--- a/gfx/cairo/cairo/src/cairo-qt-surface.cpp
++++ b/gfx/cairo/cairo/src/cairo-qt-surface.cpp
+@@ -50,6 +50,7 @@
+ #include <memory>
+ 
+ #include <QtGui/QPainter>
++#include <QtGui/QPainterPath>
+ #include <QtGui/QPaintEngine>
+ #include <QtGui/QPaintDevice>
+ #include <QtGui/QImage>
+diff --git a/ipc/chromium/src/base/message_pump_qt.cpp b/ipc/chromium/src/base/message_pump_qt.cpp
+index d96e2c5e6217..9bed34f30625 100644
+--- a/ipc/chromium/src/base/message_pump_qt.cpp
++++ b/ipc/chromium/src/base/message_pump_qt.cpp
+@@ -4,11 +4,11 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
+-#include <qabstracteventdispatcher.h>
+-#include <qevent.h>
+ #include <QCoreApplication>
+ #include <QThread>
+ #include <qtimer.h>
++#include <qabstracteventdispatcher.h>
++#include <qevent.h>
+ 
+ #include "base/message_pump_qt.h"
+ 
+diff --git a/toolkit/xre/nsQAppInstance.cpp b/toolkit/xre/nsQAppInstance.cpp
+index 73a6d009adbb..79f0d79e1228 100644
+--- a/toolkit/xre/nsQAppInstance.cpp
++++ b/toolkit/xre/nsQAppInstance.cpp
+@@ -4,8 +4,8 @@
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+-#include "nsQAppInstance.h"
+ #include <QGuiApplication>
++#include "nsQAppInstance.h"
+ #include "prenv.h"
+ #include "nsXPCOMPrivate.h"
+ #include <stdlib.h>

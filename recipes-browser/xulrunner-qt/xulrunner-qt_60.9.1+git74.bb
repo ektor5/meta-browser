@@ -77,6 +77,8 @@ SRC_URI = "gitsm://github.com/sailfishos/gecko-dev.git;branch=sailfishos-esr60;p
            file://0003-Avoid-using-autoconf2.13.patch \
            file://0004-fix-autoconf-pregenerated-old-configure.patch \
            file://0005-Remove-default-hidden-GCC-visibility.patch \
+           file://0006-EmbedContentController-Fix-for-failing-fallback.patch \
+           file://0007-Various-refactoring-include-paths.patch \
            "
 
 DEPENDS += "gtk+3 curl startup-notification libevent cairo libnotify \
@@ -89,6 +91,9 @@ DEPENDS += "gtk+3 curl startup-notification libevent cairo libnotify \
 
 SRCREV = "sailfishos/60.9.1+git74"
 
+PNORIG = "xulrunner-qt5"
+PVORIG = "60.9.1"
+
 S = "${WORKDIR}/git/"
 
 LICENSE = "MPLv2"
@@ -98,6 +103,8 @@ inherit mozilla rust-common
 
 TOOLCHAIN_pn-xulrunner-qt = "clang"
 AS = "${CC}"
+
+DISABLE_STATIC=""
 
 EXTRA_OECONF_remove = "--disable-static"
 
@@ -118,3 +125,20 @@ mozilla_run_mach_prepend() {
 	export SB2_RUST_TARGET_TRIPLE="${RUST_TARGET}"
 }
 
+do_install_append() {
+    # too many complains
+    rm -rf ${D}${libdir}/${PNORIG}-devel-*
+    
+    # not included by default
+    install -m 0644 ${S}/firefox-build-dir/dist/bin/libmozsqlite3.so ${D}${libdir}/${PNORIG}-${PVORIG}
+
+    # Fix ownership of files
+    chown root:root -R ${D}${datadir}
+    chown root:root -R ${D}${libdir}
+}
+
+FILES_${PN} = "${bindir}/${PNORIG} \
+               ${libdir}/${PNORIG}-${PVORIG} \
+               ${bindir}/defaults"
+FILES_${PN}-dev += "${datadir}/idl ${bindir}/${PNORIG}-config ${libdir}/${PNORIG}-devel-*"
+FILES_${PN}-staticdev += "${libdir}/${PNORIG}-devel-*/sdk/lib/*.a"
